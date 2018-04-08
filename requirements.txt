@@ -1,0 +1,8 @@
+certifi==2018.1.18
+chardet==3.0.4
+freesms==0.1.2
+idna==2.6
+requests==2.18.4
+rrdtool==0.1.12
+smbus2==0.2.0
+urllib3==1.22

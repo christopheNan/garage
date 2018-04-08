@@ -1,0 +1,17 @@
+[Unit]
+Description=Etat de la porte du garage
+After=rc-local.service
+
+[Service]
+PermissionsStartOnly=True
+User=pi
+Group=pi
+RuntimeDirectory=garage
+Type=forking
+PIDFile=/var/run/garage/garage.pid
+ExecStart=/home/pi/garage/garage.py 
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+

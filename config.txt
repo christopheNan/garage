@@ -1,0 +1,32 @@
+[Serveur]
+address =
+port = 8080
+
+[FreeMobile]
+user = 123456789
+password = votremotdepasse
+
+[Mail]
+destinataires = prenom.nom@service.fr
+
+[Etats]
+ferme = 0.0
+ouvert = 0.52
+lumiere = 0.57
+
+[Capteur]
+integration=402
+gain=16
+
+[Temps]
+# période de lecture du capteur en secondes
+delay = 20 
+# nombre de lectures avant de lancer une alerte
+compteur = 10 
+
+[Programme]
+logging = INFO
+pid = /var/run/garage/garage.pid
+
+[rrd]
+base=/var/rrd/garage.rrd
