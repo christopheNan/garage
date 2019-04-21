@@ -1,8 +1,8 @@
-certifi==2018.11.29
+certifi==2019.3.9
 chardet==3.0.4
 freesms==0.1.2
-idna==2.7
-requests==2.20.1
-rrdtool==0.1.14
-smbus2==0.2.1
-urllib3==1.24.1
+idna==2.8
+pkg-resources==0.0.0
+requests==2.21.0
+smbus2==0.2.3
+urllib3==1.24.2

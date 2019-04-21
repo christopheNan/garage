@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.14: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.12: http://docutils.sourceforge.net/" />
 <title>Suivi à distance de l'ouverture d'une porte de garage</title>
 <style type="text/css">
 
 /*
 :Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 7952 2016-07-26 18:15:59Z milde $
+:Id: $Id: html4css1.css 7614 2013-02-21 15:55:51Z milde $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -36,14 +36,6 @@ table.borderless td, table.borderless th {
 
 .hidden {
   display: none }
-
-.subscript {
-  vertical-align: sub;
-  font-size: smaller }
-
-.superscript {
-  vertical-align: super;
-  font-size: smaller }
 
 a.toc-backref {
   text-decoration: none ;
@@ -169,23 +161,18 @@ h2.subtitle {
 hr.docutils {
   width: 75% }
 
-img.align-left, .figure.align-left, object.align-left, table.align-left {
+img.align-left, .figure.align-left, object.align-left {
   clear: left ;
   float: left ;
   margin-right: 1em }
 
-img.align-right, .figure.align-right, object.align-right, table.align-right {
+img.align-right, .figure.align-right, object.align-right {
   clear: right ;
   float: right ;
   margin-left: 1em }
 
 img.align-center, .figure.align-center, object.align-center {
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-table.align-center {
   margin-left: auto;
   margin-right: auto;
 }
@@ -206,15 +193,6 @@ div.align-right {
 
 /* div.align-center * { */
 /*   text-align: left } */
-
-.align-top    {
-  vertical-align: top }
-
-.align-middle {
-  vertical-align: middle }
-
-.align-bottom {
-  vertical-align: bottom }
 
 ol.simple, ul.simple {
   margin-bottom: 1em }
@@ -372,6 +350,18 @@ Ce petit programme Python utilise un capteur de luminosité TSL 2561 connecté
 ou un mail pour m'avertir du changement de position.</p>
 <div class="section" id="installation">
 <h1>Installation</h1>
+<div class="section" id="prerequis">
+<h2>Prérequis</h2>
+<p>Il faut avoir installé Python 3, avec le paquet venv :</p>
+<pre class="literal-block">
+pi&#64;raspi:~ $ sudo apt-get install python3-venv
+pi&#64;raspi:~ $
+</pre>
+<p>Pour l'envoi de mails, il faut avoir configuré un programme <cite>sendmail</cite>. Le
+paquet <a class="reference external" href="https://wiki.debian.org/sSMTP">ssmtp</a> est parfait pour cela.</p>
+<p>Par ailleurs, il est possible d'enregister les mesures dans une base de
+données tournante (rrdtool). Dans ce cas, il faut avoir installé librrd-dev.</p>
+</div>
 <div class="section" id="recuperation-des-sources">
 <h2>Récupération des sources</h2>
 <p>Les dernières sources sont sur Github&nbsp;:</p>
@@ -421,12 +411,22 @@ port</p>
 <p><em>Merci Free</em>&nbsp;: nous pouvons envoyer gratuitement des SMS à notre numéro
 abonné chez Free. Rendez-vous dans votre espace abonné Free pour activer le
 service, obtenir un identifiant et un mot de passe.</p>
+<ul class="simple">
+<li>user :
+identifiant obtenu dans l'espace abonné Free</li>
+<li>password :
+mot de passe obtenu dans l'espace abonné Free</li>
+</ul>
 </div>
 <div class="section" id="section-mail">
 <h2>Section Mail</h2>
 <p>Si nous n'avons pas de mobile Free, nous pouvons quand même recevoir des
-mails. Le programme utilise la commande <cite>sendmail</cite> pour envoyer des mails.
-Vous devez donc configurer les mails sortants, par exemple avec ssmtp.</p>
+mails. Le programme utilise la commande <cite>sendmail</cite> pour envoyer des mails
+(voir la section <a class="reference internal" href="#prerequis">Prérequis</a>).</p>
+<ul class="simple">
+<li>destinataires :
+une liste d'adresses mail séparées par des virgules.</li>
+</ul>
 </div>
 <div class="section" id="section-etats">
 <h2>Section Etats</h2>
@@ -435,32 +435,38 @@ croissant de la luminosité.</p>
 </div>
 <div class="section" id="section-capteur">
 <h2>Section Capteur</h2>
-<p>Le TSL2561 peut être configuré avec deux paramètres&nbsp;:
-- temps d'intégration&nbsp;: 13, 101 ou 402 ms
-- gain&nbsp;: 1 ou 16</p>
+<p>Le TSL2561 peut être configuré avec deux paramètres&nbsp;:</p>
+<ul class="simple">
+<li>temps d'intégration&nbsp;:
+13, 101 ou 402 ms</li>
+<li>gain&nbsp;:
+1 ou 16</li>
+</ul>
 </div>
 <div class="section" id="section-temps">
 <h2>Section Temps</h2>
 <p>Configurer ici&nbsp;:</p>
 <ul class="simple">
 <li>delay&nbsp;:
-C'est l'intervalle de temps en secondes entre 2 mesures.</li>
+c'est l'intervalle de temps en secondes entre 2 mesures.</li>
 <li>compteur&nbsp;:
-C'est le nombre de mesures invalides consécutives avant d'envoyer un
+c'est le nombre de mesures invalides consécutives avant d'envoyer un
 message d'erreur.</li>
 </ul>
 </div>
 <div class="section" id="section-programme">
 <h2>Section Programme</h2>
-<ul class="simple">
-<li>logging&nbsp;:
-Définissez ici le niveau des traces que vous souhaitez&nbsp;: DEBUG, INFO,
-WARNING ou ERROR</li>
-<li>pid&nbsp;:
-Définissez ici le fichier dans lequel est stocké le PID du programme. Ce
-paramètre est utilisé par systemd pour suivre le programme. Si vous
+<ul>
+<li><p class="first">logging&nbsp;:
+définissez ici le niveau des traces que vous souhaitez&nbsp;: DEBUG, INFO,
+WARNING ou ERROR</p>
+</li>
+<li><p class="first">pid&nbsp;:
+définissez ici le fichier dans lequel est stocké le PID du programme.</p>
+<p>Ce paramètre est utilisé par systemd pour suivre le programme. Si vous
 modifiez cette valeur, veillez à répercuter la modification dans le fichier
-de configuration du service systemd (/etc/systemd/system/garage.service)</li>
+de configuration du service systemd (/etc/systemd/system/garage.service)</p>
+</li>
 </ul>
 </div>
 <div class="section" id="section-rrd">
@@ -518,15 +524,15 @@ pi&#64;raspi:~/garage $ sudo systemctl start garage.service
 pi&#64;raspi:~/garage $ sudo systemctl status garage.service
 </pre>
 <ul class="simple">
-<li>Activation au démarrage&nbsp;:</li>
+<li>Activation automatique au démarrage du raspberry&nbsp;:</li>
 </ul>
 <pre class="literal-block">
 pi&#64;raspi:~/garage $ sudo systemctl enable garage.service
 </pre>
 </div>
-<div class="section" id="license">
-<h1>License</h1>
-<p>Ce logiciel est distribué sous la license GPL v3.</p>
+<div class="section" id="licence">
+<h1>Licence</h1>
+<p>Ce logiciel est distribué sous la licence GPL v3.</p>
 </div>
 </div>
 </body>

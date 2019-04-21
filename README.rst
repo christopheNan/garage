@@ -13,6 +13,19 @@ ou un mail pour m'avertir du changement de position.
 
 Installation
 ============
+Prérequis
+---------
+Il faut avoir installé Python 3, avec le paquet venv :
+::
+
+  pi@raspi:~ $ sudo apt-get install python3-venv
+  pi@raspi:~ $
+
+Pour l'envoi de mails, il faut avoir configuré un programme `sendmail`. Le
+paquet `ssmtp <https://wiki.debian.org/sSMTP>`_ est parfait pour cela.
+
+Par ailleurs, il est possible d'enregister les mesures dans une base de
+données tournante (rrdtool). Dans ce cas, il faut avoir installé librrd-dev.
 
 Récupération des sources
 ------------------------
@@ -66,11 +79,20 @@ Section FreeMobile
 abonné chez Free. Rendez-vous dans votre espace abonné Free pour activer le
 service, obtenir un identifiant et un mot de passe.
 
+- user :
+  identifiant obtenu dans l'espace abonné Free
+
+- password :
+  mot de passe obtenu dans l'espace abonné Free
+
 Section Mail
 ------------
 Si nous n'avons pas de mobile Free, nous pouvons quand même recevoir des
-mails. Le programme utilise la commande `sendmail` pour envoyer des mails.
-Vous devez donc configurer les mails sortants, par exemple avec ssmtp.
+mails. Le programme utilise la commande `sendmail` pour envoyer des mails
+(voir la section `Prérequis`_).
+
+- destinataires :
+  une liste d'adresses mail séparées par des virgules.
 
 Section Etats
 -------------
@@ -80,28 +102,33 @@ croissant de la luminosité.
 Section Capteur
 ---------------
 Le TSL2561 peut être configuré avec deux paramètres :
-- temps d'intégration : 13, 101 ou 402 ms
-- gain : 1 ou 16
+
+- temps d'intégration :
+  13, 101 ou 402 ms
+
+- gain :
+  1 ou 16
 
 Section Temps
 -------------
 Configurer ici :
 
 - delay :
-  C'est l'intervalle de temps en secondes entre 2 mesures.
+  c'est l'intervalle de temps en secondes entre 2 mesures.
 
 - compteur :
-  C'est le nombre de mesures invalides consécutives avant d'envoyer un
+  c'est le nombre de mesures invalides consécutives avant d'envoyer un
   message d'erreur.
 
 Section Programme
 -----------------
 - logging :
-  Définissez ici le niveau des traces que vous souhaitez : DEBUG, INFO,
+  définissez ici le niveau des traces que vous souhaitez : DEBUG, INFO,
   WARNING ou ERROR
 - pid :
-  Définissez ici le fichier dans lequel est stocké le PID du programme. Ce
-  paramètre est utilisé par systemd pour suivre le programme. Si vous
+  définissez ici le fichier dans lequel est stocké le PID du programme.
+
+  Ce paramètre est utilisé par systemd pour suivre le programme. Si vous
   modifiez cette valeur, veillez à répercuter la modification dans le fichier
   de configuration du service systemd (/etc/systemd/system/garage.service)
 
@@ -155,7 +182,7 @@ Gestion du service systemd
 
   pi@raspi:~/garage $ sudo systemctl status garage.service
 
-- Activation au démarrage :
+- Activation automatique au démarrage du raspberry :
 
 ::
 

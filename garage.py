@@ -5,7 +5,7 @@ Surveillance de la luminosité dans le garage. Si la luminosité est
 supérieure à un seuil pendant une certaine durée, provoque l'envoi
 d'une notification.
 
-Copyright (C) 2018  christophe Nanteuil <christophe.nanteuil@gmail.com>
+Copyright (C) 2018,2019  christophe Nanteuil <christophe.nanteuil@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -29,16 +29,24 @@ import time
 import logging
 import logging.handlers
 import freesms
+import requests
 import sys
 from email.mime.text import MIMEText
 from subprocess import Popen, PIPE
-import rrdtool
 from daemon3x import daemon
 
-FICH_CONFIG = '/etc/garage/garage.conf'
+FICH_CONFIG = '/etc/garage.conf'
 ERR_I2C = 1
 ERR_TSL = 2
 FMT_DATE = "%H:%M:%S"
+
+
+def rrd_present():
+    try:
+        import rrdtool
+    except ImportError:
+        return False
+    return True
 
 
 def envoi_mail(message):
@@ -56,11 +64,18 @@ def previens(msg, f):
     param: f: descripteur pour envoi sms
     """
     logger.info(msg)
-    reponse = f.send_sms(msg)
-    if reponse.success():
-        logger.info("SMS envoyé")
-    else:
-        logger.error("Erreur lors de l'envoi du SMS")
+    try:
+        reponse = f.send_sms(msg)
+        if reponse.success():
+            logger.info("SMS envoyé")
+        else:
+            logger.error("Erreur lors de l'envoi du SMS")
+    except requests.exceptions.ConnectionError as errc:
+        logger.error("Error Connecting:{}".format(errc))
+    except requests.exceptions.Timeout as errt:
+        logger.error("Timeout Error:{}".format(errt))
+    except requests.exceptions.RequestException as err:
+        logger.error("OOps: {}".format(err))
     if not envoi_mail(msg):
         logger.error("Erreur lors de l'envoi du mail")
 
@@ -133,13 +148,15 @@ class Surveille(daemon):
             logger.debug("Valeur lue : %s - état : %s", lux, etat)
             if etat != etat_avant:
                 gdh = datetime.datetime.now()
-                msg = "garage : etat {statut} a {gdh}".format(statut=etat,
-                                                  gdh=gdh.strftime(FMT_DATE))
+                msg = "garage : etat {statut}" \
+                      " a {gdh}".format(statut=etat,
+                                        gdh=gdh.strftime(FMT_DATE))
 
                 previens(msg, f)
             etat_avant = etat
             try:
-                rrdtool.update(config["rrd"]["base"], "N:{}".format(lux))
+                if rrd_store:
+                    rrdtool.update(config["rrd"]["base"], "N:{}".format(lux))
             except rrdtool.OperationalError:
                 pass
 
@@ -226,6 +243,7 @@ def lit_params_ligne_cmd():
 
 
 if __name__ == "__main__":
+    rrd_store = rrd_present()
     logger = logging.getLogger('Garage')
     args = lit_params_ligne_cmd()
     config = init_prog(args)

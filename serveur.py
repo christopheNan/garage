@@ -88,6 +88,7 @@ def initialisation():
         sys.exit(ERR_CONFIG)
     return tsl, addr, port
 
+
 if __name__ == '__main__':
     tsl, addr, port = initialisation()
     httpd = HTTPServer((addr, port), mon_serveur)

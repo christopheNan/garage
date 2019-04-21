@@ -6,6 +6,7 @@ import time
 import atexit
 import signal
 
+
 class daemon:
     """A generic daemon class.
 
@@ -41,7 +42,7 @@ class daemon:
         atexit.register(self.delpid)
 
         pid = str(os.getpid())
-        with open(self.pidfile,'w+') as f:
+        with open(self.pidfile, 'w+') as f:
             f.write(pid + '\n')
 
     def delpid(self):
@@ -52,7 +53,7 @@ class daemon:
 
         # Check for a pidfile to see if the daemon already runs
         try:
-            with open(self.pidfile,'r') as pf:
+            with open(self.pidfile, 'r') as pf:
                 pid = int(pf.read().strip())
         except IOError:
             pid = None
@@ -70,7 +71,7 @@ class daemon:
         """Stop the daemon."""
         # Get the pid from the pidfile
         try:
-            with open(self.pidfile,'r') as pf:
+            with open(self.pidfile, 'r') as pf:
                 pid = int(pf.read().strip())
         except IOError:
             pid = None
@@ -78,7 +79,7 @@ class daemon:
         if not pid:
             sys.stderr.write("pidfile {0} does not exist. "
                              "Daemon not running?\n".format(self.pidfile))
-            return # not an error in a restart
+            return  # not an error in a restart
 
         # Try killing the daemon process
         try:
@@ -91,7 +92,7 @@ class daemon:
                 if os.path.exists(self.pidfile):
                     os.remove(self.pidfile)
             else:
-                print (str(err.args))
+                print(str(err.args))
                 sys.exit(1)
 
     def restart(self):
@@ -104,4 +105,3 @@ class daemon:
 
         It will be called after the process has been daemonized by
         start() or restart()."""
-

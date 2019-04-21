@@ -111,7 +111,7 @@ class TSL2561:
         self.active(True)
         self._register8(_REGISTER_TIMING,
             _INTEGRATION_TIME[self._integration_time][0] |
-            {1: 0x00, 16: 0x10}[self._gain]);
+            {1: 0x00, 16: 0x10}[self._gain])
         self.active(was_active)
 
     def _get_gain_and_time(self):
@@ -119,8 +119,10 @@ class TSL2561:
         if (result & 0xF0) == 0:
             gain = 1
         else:
-            gain =  16
-        integration_time = next(key for key,(value, _, _, _, _, _)  in _INTEGRATION_TIME.items() if value == (result & 0x0F))
+            gain = 16
+        integration_time = next(key for key, (value, _, _, _, _, _)
+                                in _INTEGRATION_TIME.items()
+                                if value == (result & 0x0F))
         return gain, integration_time
 
     def sensor_id(self):
@@ -196,14 +198,16 @@ class TSL2561:
                 self._register8(_REGISTER_INTERRUPT, _INTERRUPT_NONE)
             else:
                 self._register8(_REGISTER_INTERRUPT,
-                    min(15, max(0, int(cycles))) | _INTERRUPT_LEVEL)
+                                min(15, max(0,
+                                            int(cycles))) | _INTERRUPT_LEVEL)
         self.active(was_active)
 
     def interrupt(self, value):
         if value or value is None:
             raise ValueError("can only clear the interrupt")
         self.bus.write_byte_data(self.address,
-            _CLEAR_BIT | _REGISTER_CONTROL, b'\x00')
+                                 _CLEAR_BIT | _REGISTER_CONTROL,
+                                 b'\x00')
 
 
 # Those packages are identical.

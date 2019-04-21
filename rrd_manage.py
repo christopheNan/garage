@@ -28,15 +28,17 @@ import logging
 
 FICH_CONFIG = '/etc/garage/garage.conf'
 
+
 class Args:
     pass
+
 
 def cree_rrd_database(db_file, step):
     nb_points = int(7 * 60 * 24 * 20 / step)
     heart_beat = int(3 * step)
     data_sources = ["DS:lumin:GAUGE:{}:0:10".format(heart_beat),
                     "RRA:MIN:0.5:1:{}".format(nb_points),
-                   ]
+                    ]
     rrdtool.create(db_file, "-s {}".format(step*3), data_sources)
     logging.debug("Base de données {} créée.".format(db_file))
     logging.debug("Data sources : {}".format(data_sources))
@@ -49,16 +51,18 @@ if __name__ == '__main__':
     level = logging.DEBUG
     niveaux_log = [k for k in logging._nameToLevel if k != 'NOTSET']
     try:
-        level = logging._nameToLevel.get(config["Programme"]["logging"].upper(),
-                                        level)
+        niveau_config = config["Programme"]["logging"].upper()
+        level = logging._nameToLevel.get(niveau_config, level)
     except KeyError as e:
         level = logging.DEBUG
         logging.warning("Erreur dans la clé {} du fichier de "
                         "configuration".format(e))
-    parser = argparse.ArgumentParser(description="Gérer la base de données du capteur de luminosité.")
+    parser = argparse.ArgumentParser(description="Gérer la base de données "
+                                                 "du capteur de luminosité.")
     parser.add_argument("-l", "--log-level",
                         action="store",
-                        help="spécifier le niveau sous la forme [DEBUG|INFO|WARN...]")
+                        help="spécifier le niveau sous la forme "
+                             "[DEBUG|INFO|WARN...]")
     parser.add_argument("-c", "--create",
                         action="store_true",
                         help="créer la base de données")
@@ -83,4 +87,3 @@ if __name__ == '__main__':
         logging.debug("Argument create : {}".format(args.create))
         step = int(config["Temps"]["delay"])
         cree_rrd_database(db_file, step)
-
