@@ -15,10 +15,11 @@ Installation
 ============
 Prérequis
 ---------
-Il faut avoir installé Python 3, avec le paquet venv :
+Il faut avoir installé git (pour récupérer les sources), i2c-tools (pour 
+déboguer le bus i2c) et Python 3 avec le paquet venv :
 ::
 
-  pi@raspi:~ $ sudo apt-get install python3-venv
+  pi@raspi:~ $ sudo apt-get install git i2c-tools python3-venv
   pi@raspi:~ $
 
 Pour l'envoi de mails, il faut avoir configuré un programme `sendmail`. Le
@@ -33,7 +34,7 @@ Les dernières sources sont sur Github :
 
 ::
 
-  pi@raspi:~ $ git clone git@github.com:christopheNan/garage.git
+  pi@raspi:~ $ git clone https://github.com/christopheNan/garage.git
   pi@raspi:~ $ cd garage
   pi@raspi:~/garage $
 
