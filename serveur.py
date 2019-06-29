@@ -27,8 +27,8 @@ import sys
 
 ERR_I2C = 1
 ERR_TSL = 2
-ERR_FICH_CONFIG = 3
-FICH_CONFIG = "/etc/garage/garage.conf"
+ERR_CONFIG = 3
+FICH_CONFIG = "/etc/garage.conf"
 
 
 class mon_serveur(BaseHTTPRequestHandler):

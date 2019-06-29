@@ -1,8 +1,8 @@
-certifi==2019.3.9
+certifi==2019.6.16
 chardet==3.0.4
 freesms==0.1.2
 idna==2.8
 pkg-resources==0.0.0
-requests==2.21.0
+requests==2.22.0
 smbus2==0.2.3
-urllib3==1.24.2
+urllib3==1.25.3

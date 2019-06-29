@@ -46,6 +46,9 @@ Raspberry, nous créons un environnement virtuel :
 
   pi@raspi:~/garage $ mkdir -p ~/.Envs/ && python3 -m venv ~/.Envs/garage/
   pi@raspi:~/garage $ . ~/.Envs/garage/bin/activate
+  (garage)pi@raspi:~/garage $ # mise à jour de pip et setuptools
+  (garage)pi@raspi:~/garage $ pip install -U pip setuptools
+  (garage)pi@raspi:~/garage $ # installation des dépendances
   (garage)pi@raspi:~/garage $ pip install -r requirements.txt
 
 Installation en tant que service systemd
@@ -55,6 +58,7 @@ soit surveillé, nous le lançons en tant que service systemd :
 ::
 
   (garage)pi@raspi:~/garage $ sudo cp garage.service /etc/systemd/system/
+  (garage)pi@raspi:~/garage $ sudo systemctl enable garage.service
   (garage)pi@raspi:~/garage $ sudo mkdir -p /var/run/garage
   (garage)pi@raspi:~/garage $ sudo chown pi:pi /var/run/garage
 
