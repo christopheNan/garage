@@ -34,19 +34,16 @@ import sys
 from email.mime.text import MIMEText
 from subprocess import Popen, PIPE
 from daemon3x import daemon
+try:
+    import rrdtool
+    rrd_store = True
+except ImportError:
+    rrd_store = False
 
 FICH_CONFIG = '/etc/garage.conf'
 ERR_I2C = 1
 ERR_TSL = 2
 FMT_DATE = "%H:%M:%S"
-
-
-def rrd_present():
-    try:
-        import rrdtool
-    except ImportError:
-        return False
-    return True
 
 
 def envoi_mail(message):
@@ -156,7 +153,7 @@ class Surveille(daemon):
             etat_avant = etat
             try:
                 if rrd_store:
-                    rrdtool.update(config["rrd"]["base"], "N:{}".format(lux))
+                    rrdtool.update(config["rrd"]["base"], "N:{}".format(lux*100))
             except rrdtool.OperationalError:
                 pass
 
@@ -186,8 +183,12 @@ def init_prog(args):
         handler = logging.StreamHandler()
     else:
         handler = logging.handlers.SysLogHandler(address='/dev/log')
-        if hasattr(args, "log_file"):
-            handler = logging.FileHandler(args.log_file)
+        if hasattr(args, "log_file") and args.log_file:
+            try:
+                handler = logging.FileHandler(args.log_file)
+            except TypeError:
+                print("Bad log file in command line: {}".format(args.log_file))
+                sys.exit(1)
         else:
             try:
                 logfile = config["Programme"]["logfile"]
@@ -233,6 +234,9 @@ def lit_params_ligne_cmd():
     parser.add_argument("-f", "--foreground",
                         action="store_true",
                         help="fonctionner en premier plan")
+    parser.add_argument("--log_file",
+                        action="store",
+                        help="fichier dans lequel stocker les log")
     parser.add_argument("-c", "--config",
                         type=argparse.FileType('r'),
                         default=FICH_CONFIG,
@@ -243,7 +247,6 @@ def lit_params_ligne_cmd():
 
 
 if __name__ == "__main__":
-    rrd_store = rrd_present()
     logger = logging.getLogger('Garage')
     args = lit_params_ligne_cmd()
     config = init_prog(args)

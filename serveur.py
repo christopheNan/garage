@@ -33,16 +33,27 @@ FICH_CONFIG = "/etc/garage.conf"
 
 class mon_serveur(BaseHTTPRequestHandler):
 
-    def do_GET(self):
-        if self.path == '/favicon.ico':
-            self.send_response(200)
-            self.send_header("Content-type", "image/png")
-            with open('favicon.png', mode='rb') as fich:
+    def serve_image(self, filename):
+        if 'garage' in filename:
+            filename = '/var/log/garage' + filename
+        else:
+            filename = '.' + filename
+        try:
+            with open(filename, mode='rb') as fich:
                 contenu = fich.read()
-            self.send_header("Content-length", len(contenu))
-            self.end_headers()
-            self.wfile.write(contenu)
+        except FileNotFoundError:
+            self.send_response(404)
             return
+        self.send_response(200)
+        self.send_header("Content-type", "image/png")
+        self.send_header("Content-length", len(contenu))
+        self.end_headers()
+        self.wfile.write(contenu)
+
+    def do_GET(self):
+        if self.path in ('/favicon.ico', '/garage_annee.png',
+            '/garage_jour.png', '/garage_mois.png'):
+            return self.serve_image(self.path)
 
         if self.path != '/':
             self.send_response(404)
@@ -58,8 +69,12 @@ class mon_serveur(BaseHTTPRequestHandler):
         # envoi message
         lu = tsl.read()
         tsl.active(False)
-        self.wfile.write(bytes("La lumière vaut {lu}\n".format(lu=lu),
-                               "utf8"))
+        self.wfile.write(bytes(
+        """La lumière vaut {lu}<br>
+        <img src='/garage_jour.png' alt='Graphique du jour'</img><br>
+        <img src='/garage_mois.png' alt='Graphique du mois'</img><br>
+        <img src='/garage_annee.png' alt='Graphique de année'</img><br>
+        """.format(lu=lu), "utf8"))
 
 
 def initialisation():

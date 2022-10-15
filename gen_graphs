@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+set -u
+
+REP="/var/log/garage/"
+PERIODES="jour mois annee"
+declare -A DUREE
+DUREE["jour"]="days"
+DUREE["mois"]="months"
+DUREE["annee"]="years"
+
+if [[ "$#" -ne "1" ]]; then
+    echo "manque le paramètre ${PERIODES}"
+    exit 1
+fi
+
+if [[ ! ${PERIODES} =~ "$1" ]]; then
+	echo "mauvais paramètre $1 (attendu ${PERIODES})"
+	exit 1
+fi
+
+rrdtool graph $REP/garage_$1.png \
+	--imgformat PNG \
+	--title="Eclairage garage - ${1}" \
+	--width 1280 --height 380 \
+	--end now --start end-1${DUREE["${1}"]} \
+	--vertical-label "Lux" \
+	"DEF:lux=$REP/garage.rrd:lumin:AVERAGE" \
+	'LINE1:lux#ff0000:Luminosité' \
+	'GPRINT:lux:LAST:Dernière luminosité\: %2.1lf' > /dev/null

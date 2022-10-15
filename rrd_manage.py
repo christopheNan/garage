@@ -25,8 +25,9 @@ import sys
 import configparser
 import argparse
 import logging
+from datetime import datetime
 
-FICH_CONFIG = '/etc/garage/garage.conf'
+FICH_CONFIG = '/etc/garage.conf'
 
 
 class Args:
@@ -36,10 +37,10 @@ class Args:
 def cree_rrd_database(db_file, step):
     nb_points = int(7 * 60 * 24 * 20 / step)
     heart_beat = int(3 * step)
-    data_sources = ["DS:lumin:GAUGE:{}:0:10".format(heart_beat),
-                    "RRA:MIN:0.5:1:{}".format(nb_points),
+    data_sources = ["DS:lumin:GAUGE:{}:0:U".format(heart_beat),
+                    "RRA:MAX:0.9:1:{}".format(nb_points),
                     ]
-    rrdtool.create(db_file, "-s {}".format(step*3), data_sources)
+    rrdtool.create(db_file, "--step", str(step*3), data_sources)
     logging.debug("Base de données {} créée.".format(db_file))
     logging.debug("Data sources : {}".format(data_sources))
 
@@ -66,6 +67,9 @@ if __name__ == '__main__':
     parser.add_argument("-c", "--create",
                         action="store_true",
                         help="créer la base de données")
+    parser.add_argument("-i", "--info",
+                        action="store_true",
+                        help="informations sur la base de données")
     args = Args()
     parser.parse_args(namespace=args)
     if args.log_level:
@@ -77,7 +81,7 @@ if __name__ == '__main__':
                           " {} n'est pas dans {}".format(args.log_level,
                                                          niveaux_log))
     logging.basicConfig(level=level)
-    logging.info("Démarrage du programme")
+    logging.info("Démarrage de {} ".format(sys.argv[0]))
     try:
         db_file = config["rrd"]["base"]
     except KeyError as e:
@@ -87,3 +91,12 @@ if __name__ == '__main__':
         logging.debug("Argument create : {}".format(args.create))
         step = int(config["Temps"]["delay"])
         cree_rrd_database(db_file, step)
+    if args.info:
+        logging.debug("Argument info: {}".format(args.info))
+        if os.path.exists(db_file):
+            print("Informations sur la base de données {}".format(db_file))
+            infos = rrdtool.info(db_file)
+            print("Dernière mise à jour :", datetime.fromtimestamp(infos["last_update"]), "avec la valeur", infos["ds[lumin].last_ds"])
+        else:
+            print("La base de données {} n'existe pas".format(db_file))
+
